@@ -2,7 +2,15 @@
 
 An experimental esolang by Chris Natcharian.
 
-This rust library defines a modular lexer and interpreter for the Letterbox language, which can be used together or separately in your Rust programs.
+The purpose of this crate is to define a simple, frontend-agnostic API with which more complex applications can run Letterbox programs in contained environments. Programs are interpreted from strings and create strings as output; data is stored independently and can be reused between programs.
+
+## Parts of this crate
+
+- `LbStorage` represents a bank of 26 variables, each stored under a lowercase letter of the alphabet ('a' to 'z'). Each can hold one String or one float.
+- `LbToken` is an enum derived from [Logos](https://crates.io/crates/logos) that defines the valid tokens of the Letterbox language. An instance of `LbToken::lexer` can convert a textual Letterbox program into individual tokens AND parse out their arguments.
+- `LbProgram` consumes a lexer containing zero or more tokens and executes them on some `LbStorage`. It can also accept program arguments and expose program output.
+
+For more details, see the [crate docs](https://docs.rs/letterbox-lang/).
 
 ## How to write a Letterbox program
 
@@ -10,7 +18,7 @@ See the language documentation on [its Esolang Wiki page](https://esolangs.org/w
 
 ## How to run a Letterbox program
 
-The purpose of this crate is to define a simple, frontend-agnostic API with which more complex applications can run Letterbox programs in contained environments. Programs are interpreted from strings and create strings as output.
+This is a minimal example of a Rust program that executes a Letterbox program. For a more full-featured example, see [the Letterbox command line tool](https://github.com/CNatcharian/rs-letterbox).
 
 ```rust
 // import all required types
@@ -55,5 +63,3 @@ else {
     println!("{}", output_buffer); // prints Hello world!
 }
 ```
-
-Programs exist separately from the data they operate upon. Storage objects can be reused by multiple Programs.
