@@ -1,6 +1,6 @@
 use crate::storage::*;
 use crate::program::*;
-use crate::lb_lexer::LBT;
+use crate::lb_lexer::LbToken;
 use logos::Logos;
 
 /// Made for testing Letterbox programs.
@@ -9,11 +9,11 @@ use logos::Logos;
 #[macro_export]
 macro_rules! assert_lb_out {
     ( $x:expr, $y:expr ) => {
-        let mut data = Storage::new();
+        let mut data = LbStorage::new();
         let mut out = String::new();
-        let lex = LBT::lexer($x);
+        let lex = LbToken::lexer($x);
         let inv = Vec::<String>::new();
-        let mut program = Program::new(lex, &mut data, &inv, &mut out, 1000).expect("Program init failed");
+        let mut program = LbProgram::new(lex, &mut data, &inv, &mut out, 1000).expect("Program init failed");
         let result = program.run();
         if let Err(msg) = result {
             panic!("Program failed: {}", msg);
@@ -29,11 +29,11 @@ macro_rules! assert_lb_out {
 #[macro_export]
 macro_rules! assert_lb_from_input {
     ( $x:expr, $y:expr, $z:expr ) => {
-        let mut data = Storage::new();
+        let mut data = LbStorage::new();
         let mut out = String::new();
-        let lex = LBT::lexer($x);
+        let lex = LbToken::lexer($x);
         let inv = $y;
-        let mut program = Program::new(lex, &mut data, &inv, &mut out, 1000).expect("Program init failed");
+        let mut program = LbProgram::new(lex, &mut data, &inv, &mut out, 1000).expect("Program init failed");
         let result = program.run();
         if let Err(msg) = result {
             panic!("Program failed: {}", msg);
@@ -147,7 +147,7 @@ fn finish() {
 mod math_ops {
     use crate::storage::*;
     use crate::program::*;
-    use crate::lb_lexer::LBT;
+    use crate::lb_lexer::LbToken;
     use logos::Logos;
 
     #[test]
@@ -204,7 +204,7 @@ mod math_ops {
 mod bool_ops {
     use crate::storage::*;
     use crate::program::*;
-    use crate::lb_lexer::LBT;
+    use crate::lb_lexer::LbToken;
     use logos::Logos;
 
     #[test]

@@ -2,10 +2,10 @@ use core::fmt;
 use regex::Regex;
 
 use crate::storage;
-use crate::storage::Storage;
+use crate::storage::LbStorage;
 use logos::{Lexer, Logos};
-use crate::lb_lexer::LBT;
-use crate::lb_lexer::LBT::*;
+use crate::lb_lexer::LbToken;
+use crate::lb_lexer::LbToken::*;
 
 /// A value that can be stored in a Letterbox variable.
 #[derive(Debug, Clone)]
@@ -33,19 +33,19 @@ impl fmt::Display for Val {
 }
 
 /// A struct that represents a Letterbox program.
-/// It combines a list of parsed instructions and a Storage struct,
+/// It combines a list of parsed instructions and a [LbStorage] struct,
 /// executing each instruction in order.
-pub struct Program<'a> {
-    /// An ordered list of parsed instructions. See [LBT] for details.
-    pub program_list: Vec<LBT>,
+pub struct LbProgram<'a> {
+    /// An ordered list of parsed instructions. See [LbToken] for details.
+    pub program_list: Vec<LbToken>,
 
     /// An integer that indicates the number of the next 
     /// instruction to execute from the program list.
     program_counter: usize,
 
-    /// A reference to a [Storage] struct which will be modified 
+    /// A reference to a [LbStorage] struct which will be modified 
     /// by the execution of this program.
-    data: &'a mut Storage,
+    data: &'a mut LbStorage,
 
     /// If true, this program has completed execution and can
     /// no longer be run or stepped through.
@@ -68,17 +68,17 @@ pub struct Program<'a> {
     pub loop_limit: usize,
 }
 
-impl<'a> Program<'a> {
-    /// Create a new unexecuted program from the contents of
-    /// the given lexer. Requires a reference to a Storage struct.
-    pub fn new(lex: Lexer<LBT>,
-        starting_data: &'a mut Storage,
+impl<'a> LbProgram<'a> {
+    /// Create a new unexecuted [LbProgram] from the contents of
+    /// the given lexer. Requires a reference to a [LbStorage] struct.
+    pub fn new(lex: Lexer<LbToken>,
+        starting_data: &'a mut LbStorage,
         inv: &'a Vec<String>,
         out: &'a mut String,
         loop_limit: usize,
-    ) -> Result<Program<'a>, String> {
-        let plist: Vec<LBT> = lex.collect();
-        let prog = Program {
+    ) -> Result<LbProgram<'a>, String> {
+        let plist: Vec<LbToken> = lex.collect();
+        let prog = LbProgram {
             program_list: plist,
             program_counter: 0,
             data: starting_data,
@@ -142,7 +142,7 @@ impl<'a> Program<'a> {
     /// This is the main location where parser tokens are mapped to
     /// execution implementations. Side effects abound as these implementations 
     /// can and will manipulate this program's data storage.
-    fn evaluate(&mut self, command: &LBT) -> Result<(), String> {
+    fn evaluate(&mut self, command: &LbToken) -> Result<(), String> {
         match command {
 
             // Sa4
@@ -422,9 +422,9 @@ impl<'a> Program<'a> {
                 let prog_with_params = Self::apply_argmap(prog, argmap.to_string());
 
                 // create lexer to parse the string
-                let sub_lex = LBT::lexer(&prog_with_params);
+                let sub_lex = LbToken::lexer(&prog_with_params);
                 // create new program using this program's params
-                let sub_program = Program::new(
+                let sub_program = LbProgram::new(
                     sub_lex,
                     self.data, 
                     self.input_vec, 
