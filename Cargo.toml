@@ -2,7 +2,7 @@
 name = "letterbox-lang"
 version = "0.1.0"
 edition = "2021"
-keywords = ["letterbox", "esolang", "programming", "language", "experimental", "lexer", "parser", "interpreter"]
+keywords = ["letterbox", "esolang", "lexer", "parser", "interpreter"]
 categories = ["parser-implementations"]
 description = "A modular lexer and parser for the Letterbox esoteric programming language."
 license-file = "license.txt"
