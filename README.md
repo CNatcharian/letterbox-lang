@@ -12,6 +12,24 @@ The purpose of this crate is to define a simple, frontend-agnostic API with whic
 
 For more details, see the [crate docs](https://docs.rs/letterbox-lang/).
 
+## To use this crate
+
+letterbox-lang is available on [crates.io](https://crates.io/). Add it as a dependency to your Cargo.toml file.
+
+```toml
+[dependencies]
+...
+letterbox-lang = "0.2.0"
+```
+
+If you want to contribute to this crate and make your own changes to the language, clone or fork the repo and add it to your project as a local dependency. For example:
+
+```toml
+[dependencies]
+...
+letterbox-lang = { path = "../letterbox-lang" }
+```
+
 ## How to write a Letterbox program
 
 See the language documentation on [its Esolang Wiki page](https://esolangs.org/wiki/Letterbox).
