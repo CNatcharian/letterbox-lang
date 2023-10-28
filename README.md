@@ -8,8 +8,6 @@ This rust library defines a modular lexer and interpreter for the Letterbox lang
 
 See the language documentation on [its Esolang Wiki page](https://esolangs.org/wiki/Letterbox).
 
-## Import this library
-
 ## How to run a Letterbox program
 
 The purpose of this crate is to define a simple, frontend-agnostic API with which more complex applications can run Letterbox programs in contained environments. Programs are interpreted from strings and create strings as output.
