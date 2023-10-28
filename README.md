@@ -15,14 +15,17 @@ See the language documentation on [its Esolang Wiki page](https://esolangs.org/w
 The purpose of this crate is to define a simple, frontend-agnostic API with which more complex applications can run Letterbox programs in contained environments. Programs are interpreted from strings and create strings as output.
 
 ```rust
+// import all required types
+use letterbox_lang::prelude::*;
+
 // get string representation of program
 let program_string = "P'Hello world'".to_string();
 
 // Create a lexer to consume the string
-let lex: Lexer<LBT> = LBT::lexer(program_string);
+let lex: Lexer<LbToken> = LbToken::lexer(program_string);
 
 // Create a new data storage struct on which the program will operate
-let mut data = Storage::new();
+let mut data: LbStorage = LbStorage::new();
 
 // Get a string of whitespace-separated program arguments
 let input_vec = "".to_string();
@@ -34,7 +37,7 @@ let mut output_buffer = String::new();
 let loop_limit: usize = 100;
 
 // Create a program struct which consumes the previous components
-let mut program = Program::new(
+let mut program = LbProgram::new(
     lex,
     &mut data,
     &input_vec,
