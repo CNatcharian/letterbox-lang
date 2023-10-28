@@ -2,6 +2,13 @@
 name = "letterbox-lang"
 version = "0.1.0"
 edition = "2021"
+keywords = ["letterbox", "esolang", "programming", "language", "experimental", "lexer", "parser", "interpreter"]
+categories = ["parser-implementations"]
+description = "A modular lexer and parser for the Letterbox esoteric programming language."
+license-file = "license.txt"
+repository = "https://github.com/CNatcharian/letterbox-lang"
+homepage = "https://esolangs.org/wiki/Letterbox"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
