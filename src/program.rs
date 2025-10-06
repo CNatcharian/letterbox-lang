@@ -6,9 +6,10 @@ use crate::storage::LbStorage;
 use logos::{Lexer, Logos};
 use crate::lb_lexer::LbToken;
 use crate::lb_lexer::LbToken::*;
+use serde::{Deserialize, Serialize};
 
 /// A value that can be stored in a Letterbox variable.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Val {
     Text(String),
     Number(f64),
@@ -37,7 +38,7 @@ impl fmt::Display for Val {
 /// executing each instruction in order.
 pub struct LbProgram<'a> {
     /// An ordered list of parsed instructions. See [LbToken] for details.
-    pub program_list: Vec<LbToken>,
+    pub program_list: Vec<Result<LbToken, ()>>,
 
     /// An integer that indicates the number of the next 
     /// instruction to execute from the program list.
@@ -77,7 +78,7 @@ impl<'a> LbProgram<'a> {
         out: &'a mut String,
         loop_limit: usize,
     ) -> Result<LbProgram<'a>, String> {
-        let plist: Vec<LbToken> = lex.collect();
+        let plist: Vec<Result<LbToken, ()>> = lex.collect();
         let prog = LbProgram {
             program_list: plist,
             program_counter: 0,
@@ -112,7 +113,7 @@ impl<'a> LbProgram<'a> {
         }
 
         // Get the instruction at the next position in the program.
-        if let Some(token) = self.program_list.get(self.program_counter) {
+        if let Some(Ok(token)) = self.program_list.get(self.program_counter) {
 
             // Clone the token to prevent an immutable borrow
             let command = &token.clone();
@@ -442,8 +443,6 @@ impl<'a> LbProgram<'a> {
                 self.finished = true;
                 Ok(())
             },
-
-            _ => Err(format!("Unrecognized instruction at counter index {}", self.program_counter)),
         }
     }
 

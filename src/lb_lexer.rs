@@ -3,6 +3,9 @@ use logos::{Logos, Lexer};
 /// A Logos-derived enum that can split a Letterbox program
 /// into individual tokens AND parse out their arguments.
 #[derive(Logos, Debug, PartialEq, Clone)]
+// skip whitespace
+#[logos(skip(r"![^\n\r]*"))]
+#[logos(skip(r"[ \t\n\f\r]+"))]
 pub enum LbToken {
     /// Save a value into a variable
     /// 
@@ -114,14 +117,6 @@ pub enum LbToken {
     /// Usage: `Xzacbd`
     #[regex(r"X[a-z]([a-z][a-z])*", execute_var)]
     Execute((char, String)),
-
-    /// Unrecognized character(s)
-    #[error]
-    // skip comments
-    #[regex(r"![^\n\r]*", logos::skip)]
-    // skip whitespace
-    #[regex(r"[ \t\n\f\r]+", logos::skip)]
-    Error,
 }
 
 // Parser methods!
@@ -214,7 +209,8 @@ fn base_loop(lex: &mut Lexer<LbToken>) -> Option<(char, Box<LbToken>)> {
         }
         let cmd = lex_sub(cmd_string);
         return match cmd {
-            Some(subcommand) => Some((condition, Box::new(subcommand))),
+            Some(Ok(subcommand)) => Some((condition, Box::new(subcommand))),
+            Some(Err(_)) => None,
             None => None,
         };
     }
@@ -250,7 +246,7 @@ fn get_input(lex: &mut Lexer<LbToken>) -> Option<(char, char, f64)> {
 
 /// Opens a new lexer to lex a subcommand.
 /// The subcommand comes in as a string.
-fn lex_sub(sub: String) -> Option<LbToken> {
+fn lex_sub(sub: String) -> Option<Result<LbToken, ()>> {
     let mut lex = LbToken::lexer(&sub);
     return lex.next();
 }
@@ -258,15 +254,15 @@ fn lex_sub(sub: String) -> Option<LbToken> {
 #[test]
 fn tokens_parse_correctly() {
     let mut lex = LbToken::lexer("Sa4.4 Cab P'hello world' Pa i ! This is a comment".trim());
-    assert_eq!(lex.next(), Some(LbToken::SaveNumber(('a', 4.4))));
+    assert_eq!(lex.next(), Some(Ok(LbToken::SaveNumber(('a', 4.4)))));
     assert_eq!(lex.slice(), "Sa4.4");
-    assert_eq!(lex.next(), Some(LbToken::Copy(('a', 'b'))));
+    assert_eq!(lex.next(), Some(Ok(LbToken::Copy(('a', 'b')))));
     assert_eq!(lex.slice(), "Cab");
-    assert_eq!(lex.next(), Some(LbToken::PrintStr(String::from("hello world"))));
+    assert_eq!(lex.next(), Some(Ok(LbToken::PrintStr(String::from("hello world")))));
     assert_eq!(lex.slice(), "P'hello world'");
-    assert_eq!(lex.next(), Some(LbToken::PrintVar('a')));
+    assert_eq!(lex.next(), Some(Ok(LbToken::PrintVar('a'))));
     assert_eq!(lex.slice(), "Pa");
-    assert_eq!(lex.next(), Some(LbToken::Error)); 
+    assert_eq!(lex.next(), Some(Err(()))); 
     assert_eq!(lex.slice(), "i");
     assert_eq!(lex.next(), None);
 }
@@ -274,17 +270,17 @@ fn tokens_parse_correctly() {
 #[test]
 fn advanced_tokens() {
     let mut lex = LbToken::lexer("MAbcd RA WaIcXzabcd !comment here".trim());
-    assert_eq!(lex.next(), Some(LbToken::MathOp(('A', 'b', 'c', 'd'))));
+    assert_eq!(lex.next(), Some(Ok(LbToken::MathOp(('A', 'b', 'c', 'd')))));
     assert_eq!(lex.slice(), "MAbcd");
-    assert_eq!(lex.next(), Some(LbToken::ResetAll));
+    assert_eq!(lex.next(), Some(Ok(LbToken::ResetAll)));
     assert_eq!(lex.slice(), "RA");
-    assert_eq!(lex.next(), Some(
+    assert_eq!(lex.next(), Some(Ok(
         LbToken::WhileLoop(('a', Box::new(
             LbToken::IfStatement(('c', Box::new(
                 LbToken::Execute(('z', String::from("abcd")))
             )))
         )))
-    ));
+    )));
     assert_eq!(lex.slice(), "WaIcXzabcd");
     assert_eq!(lex.next(), None);
 }
@@ -298,11 +294,11 @@ Sn0 ! GNn0
 
 ! variables
 Sa0 Sb1".trim());
-    assert_eq!(lex.next(), Some(LbToken::SaveNumber(('n', 0.0))));
+    assert_eq!(lex.next(), Some(Ok(LbToken::SaveNumber(('n', 0.0)))));
     assert_eq!(lex.slice(), "Sn0");
-    assert_eq!(lex.next(), Some(LbToken::SaveNumber(('a', 0.0))));
+    assert_eq!(lex.next(), Some(Ok(LbToken::SaveNumber(('a', 0.0)))));
     assert_eq!(lex.slice(), "Sa0");
-    assert_eq!(lex.next(), Some(LbToken::SaveNumber(('b', 1.0))));
+    assert_eq!(lex.next(), Some(Ok(LbToken::SaveNumber(('b', 1.0)))));
     assert_eq!(lex.slice(), "Sb1");
     assert_eq!(lex.next(), None);
 }
