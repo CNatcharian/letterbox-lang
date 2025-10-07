@@ -85,4 +85,8 @@ impl LbStorage {
             Val::Text(_) => Some(true),
         };
     }
+
+    pub fn to_hashmap(&self) -> HashMap<char, Val> {
+        self.data.clone()
+    }
 }
