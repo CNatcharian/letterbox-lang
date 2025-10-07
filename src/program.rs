@@ -467,6 +467,11 @@ impl<'a> LbProgram<'a> {
         self.finished = self.program_counter >= self.program_list.len();
     }
 
+    /// Gets the current value of the program counter.
+    pub fn read_counter(&self) -> usize {
+        self.program_counter.to_owned()
+    }
+
     /// Used by Execute (`Xzacbd`).
     /// 
     /// Given a string of sequential argument mappings (i.e. "acbd"), and a String containing
