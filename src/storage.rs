@@ -26,6 +26,15 @@ impl LbStorage {
         return store;
     }
 
+    /// Returns a new [LbStorage] instance that takes ownership of the given HashMap
+    /// and uses it as its own data.
+    pub fn from_hashmap(existing_data: HashMap<char, Val>) -> LbStorage {
+        let store = LbStorage {
+            data: existing_data.to_owned(),
+        };
+        return store;
+    }
+
     /// Gets the value stored under the given variable name.
     /// If the name is invalid, returns `None`.
     /// If nothing has been stored under the valid name, returns the default value of `0`.

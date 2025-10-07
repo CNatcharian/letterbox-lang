@@ -457,6 +457,16 @@ impl<'a> LbProgram<'a> {
         }
     }
 
+    /// Sets the program counter to a given [usize].
+    /// Any number greater than the length of the program
+    /// will cause the program to finish.
+    /// A finished program can be reran by jumping to a
+    /// valid instruction.
+    pub fn jump_to(&mut self, instruction: usize) {
+        self.program_counter = instruction;
+        self.finished = self.program_counter >= self.program_list.len();
+    }
+
     /// Used by Execute (`Xzacbd`).
     /// 
     /// Given a string of sequential argument mappings (i.e. "acbd"), and a String containing

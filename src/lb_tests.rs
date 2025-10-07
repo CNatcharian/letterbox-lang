@@ -42,6 +42,27 @@ macro_rules! assert_lb_from_input {
     };
 }
 
+/// Made for testing Letterbox programs.
+/// Asserts that string A, when run as a Letterbox program,
+/// produces string B as output.
+/// Accepts an initial program counter value.
+#[macro_export]
+macro_rules! assert_lb_with_pc {
+    ( $x:expr, $y:expr, $z:expr ) => {
+        let mut data = LbStorage::new();
+        let mut out = String::new();
+        let lex = LbToken::lexer($x);
+        let inv = Vec::<String>::new();
+        let mut program = LbProgram::new(lex, &mut data, &inv, &mut out, 1000).expect("Program init failed");
+        program.jump_to($z);
+        let result = program.run();
+        if let Err(msg) = result {
+            panic!("Program failed: {}", msg);
+        }
+        assert_eq!(out, String::from($y));
+    };
+}
+
 #[test]
 fn print_store_copy() {
     assert_lb_out!("Sb3", "");
@@ -237,5 +258,23 @@ mod bool_ops {
         assert_lb_out!("Sa0 Sb'' BXcab Pc",   "1"); // f t
         assert_lb_out!("Sa'cz' Sb0 BXcab Pc", "1"); // t f
         assert_lb_out!("Sa0 Sb0.0 BXcab Pc",  "0"); // f f
+    }
+}
+
+#[cfg(test)]
+mod api {
+    use crate::storage::*;
+    use crate::program::*;
+    use crate::lb_lexer::LbToken;
+    use logos::Logos;
+
+    #[test]
+    fn jump_to() {
+        assert_lb_with_pc!("P'This will not print' Sa4 Pa", "4", 1);
+    }
+
+    #[test]
+    fn jump_to_finish() {
+        assert_lb_with_pc!("P'This will not print' Sa4 Pa", "", 5);
     }
 }
