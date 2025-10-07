@@ -9,7 +9,7 @@ use crate::lb_lexer::LbToken::*;
 use serde::{Deserialize, Serialize};
 
 /// A value that can be stored in a Letterbox variable.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum Val {
     Text(String),
     Number(f64),

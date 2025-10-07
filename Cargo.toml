@@ -1,6 +1,6 @@
 [package]
 name = "letterbox-lang"
-version = "0.3.3"
+version = "0.3.4"
 edition = "2021"
 keywords = ["letterbox", "esolang", "lexer", "parser", "interpreter"]
 categories = ["parser-implementations"]
